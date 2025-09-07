@@ -8,19 +8,24 @@ import Blog from "@/components/Blog";
 import Experience from "@/components/Experience";
 import Services from "@/components/Services";
 import Contact from "@/components/Contact";
+import ParticleCursor from "@/components/ParticleCursor";
+import ThreeJSScene from "@/components/ThreeJSScene";
 
 const Index = () => {
+
   return (
     <div className="min-h-screen">
+      <ThreeJSScene />
+      <ParticleCursor />
       <Navigation />
       <Hero />
       <About />
-      <Portfolio />
+      <Experience />
       <Services />
-      <CaseStudies />
+      <Portfolio />
+      {/* <CaseStudies /> */}
       <Blog />
       <Skills />
-      <Experience />
       <Contact />
       
       {/* Footer */}

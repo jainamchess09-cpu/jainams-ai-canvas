@@ -8,20 +8,20 @@ const Navigation = () => {
   const navLinks = [
     { href: "#home", label: "Home" },
     { href: "#about", label: "About" },
-    { href: "#skills", label: "Skills" },
-    { href: "#projects", label: "Projects" },
-    { href: "#case-studies", label: "Case Studies" },
-    { href: "#blog", label: "Blog" },
     { href: "#experience", label: "Experience" },
     { href: "#services", label: "Services" },
+    { href: "#projects", label: "Projects" },
+    { href: "#skills", label: "Skills" },
+    { href: "#blog", label: "Blog" },
     { href: "#contact", label: "Contact" },
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass-nav">
+    <nav className="fixed top-5 left-9 right-9 z-50 glass-nav backdrop-blur-md rounded-[25px]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          <div className="text-3xl font-black text-primary animate-glow">jainam</div>
+          <div className="text-3xl font-black text-primary">jainam</div>
+
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-12">

@@ -1,11 +1,144 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Download, Linkedin, Mail } from "lucide-react";
 import jainamPortrait from "@/assets/jainam-portrait.jpg";
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
 
 const Hero = () => {
-  const techStack = [
-    "Python", "PyTorch", "LangChain", "Next.js", "AWS", "Docker"
-  ];
+  const imageRef = useRef<HTMLImageElement>(null);
+  const nameRef = useRef<HTMLHeadingElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+  const primaryButtonRef = useRef<HTMLButtonElement>(null);
+  const secondaryButtonRef = useRef<HTMLButtonElement>(null);
+  const backgroundBlobRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Image animation
+    if (imageRef.current) {
+      // Set initial state
+      gsap.set(imageRef.current, {
+        clipPath: "circle(0% at 50% 50%)",
+        scale: 0.9,
+        opacity: 0
+      });
+
+      // Animate to final state
+      gsap.to(imageRef.current, {
+        clipPath: "circle(100% at 50% 50%)",
+        scale: 1,
+        opacity: 1,
+        duration: 1.2,
+        ease: "power3.out",
+        delay: 0.3 // Small delay for better visual impact
+      });
+    }
+
+    // Text animations
+    const textElements = [nameRef.current, titleRef.current, descriptionRef.current].filter(Boolean);
+    
+    if (textElements.length > 0) {
+      // Set initial state for all text elements
+      gsap.set(textElements, {
+        opacity: 0,
+        y: 40
+      });
+
+      // Animate text elements with stagger
+      gsap.to(textElements, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: "power2.out",
+        stagger: 0.15,
+        delay: 0.1 // Small delay to start after image begins
+      });
+    }
+
+    // Button hover animations
+    const setupButtonAnimations = (buttonRef: React.RefObject<HTMLButtonElement>) => {
+      if (!buttonRef.current) return;
+
+      const button = buttonRef.current;
+
+      // Hover enter animation
+      const handleMouseEnter = () => {
+        gsap.to(button, {
+          scale: 1.05,
+          duration: 0.3,
+          ease: "back.out(1.7)"
+        });
+      };
+
+      // Hover leave animation
+      const handleMouseLeave = () => {
+        gsap.to(button, {
+          scale: 1,
+          duration: 0.3,
+          ease: "back.out(1.7)"
+        });
+      };
+
+      // Click animation
+      const handleClick = () => {
+        gsap.to(button, {
+          scale: 0.95,
+          duration: 0.15,
+          ease: "back.out(1.7)",
+          onComplete: () => {
+            gsap.to(button, {
+              scale: 1.05,
+              duration: 0.15,
+              ease: "back.out(1.7)"
+            });
+          }
+        });
+      };
+
+      // Add event listeners
+      button.addEventListener('mouseenter', handleMouseEnter);
+      button.addEventListener('mouseleave', handleMouseLeave);
+      button.addEventListener('click', handleClick);
+
+      // Cleanup function
+      return () => {
+        button.removeEventListener('mouseenter', handleMouseEnter);
+        button.removeEventListener('mouseleave', handleMouseLeave);
+        button.removeEventListener('click', handleClick);
+      };
+    };
+
+    // Setup animations for both buttons
+    const cleanupPrimary = setupButtonAnimations(primaryButtonRef);
+    const cleanupSecondary = setupButtonAnimations(secondaryButtonRef);
+
+    // Background blob animation
+    if (backgroundBlobRef.current) {
+      gsap.to(backgroundBlobRef.current, {
+        background: "radial-gradient(circle at 30% 70%, hsl(var(--primary) / 0.2) 0%, hsl(var(--primary) / 0.1) 30%, transparent 70%)",
+        duration: 6,
+        ease: "none",
+        repeat: -1,
+        yoyo: true
+      });
+
+      // Also animate the position for more dynamic effect
+      gsap.to(backgroundBlobRef.current, {
+        x: "20px",
+        y: "-10px",
+        duration: 8,
+        ease: "none",
+        repeat: -1,
+        yoyo: true
+      });
+    }
+
+    // Cleanup on unmount
+    return () => {
+      cleanupPrimary?.();
+      cleanupSecondary?.();
+    };
+  }, []);
 
   return (
     <section id="home" className="min-h-screen hero-gradient flex items-center pt-20">
@@ -14,14 +147,14 @@ const Hero = () => {
           {/* Left Content */}
           <div className="space-y-12">
             <div className="space-y-8">
-              <h1 className="text-7xl lg:text-8xl font-black text-foreground animate-glow">
-                Hi! Jainam
+              <h1 ref={nameRef} className="text-4xl lg:text-7xl font-black text-foreground">
+                Jainam Shah
               </h1>
-              <div className="w-32 h-2 bg-gradient-to-r from-primary to-neon-glow rounded-full premium-glow"></div>
-              <div className="typewriter text-3xl lg:text-4xl font-bold text-primary">
+              <div className="w-32 h-2 bg-gradient-to-r from-primary  rounded-full"></div>
+              <div ref={titleRef} className="typewriter text-3xl lg:text-4xl font-bold text-primary">
                 AI/ML Engineer & Entrepreneur
               </div>
-              <p className="text-xl text-secondary-foreground max-w-2xl leading-relaxed">
+              <p ref={descriptionRef} className="text-xl text-secondary-foreground max-w-2xl leading-relaxed">
                 Building production-grade generative AI solutions for SaaS, B2B, and B2C.
                 Designing user-friendly interfaces and seamless user experiences.
               </p>
@@ -29,10 +162,10 @@ const Hero = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-6">
-              <Button className="btn-primary text-xl">
+              <Button ref={primaryButtonRef} className="btn-primary text-xl">
                 Let's Talk <ArrowRight className="ml-3 h-6 w-6" />
               </Button>
-              <Button variant="outline" className="btn-secondary text-xl">
+              <Button ref={secondaryButtonRef} variant="outline" className="btn-secondary text-xl">
                 Download CV <Download className="ml-3 h-6 w-6" />
               </Button>
             </div>
@@ -40,9 +173,9 @@ const Hero = () => {
             {/* Social Links */}
             <div className="flex items-center space-x-6">
               <div className="flex -space-x-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-neon-glow border-4 border-background premium-glow"></div>
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-neon-glow to-primary border-4 border-background premium-glow"></div>
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-neon-glow border-4 border-background premium-glow"></div>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-neon-glow border-4 border-background "></div>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-neon-glow to-primary border-4 border-background "></div>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-neon-glow border-4 border-background "></div>
               </div>
               <span className="text-lg text-muted-foreground font-medium">Trusted by 50+ Clients</span>
             </div>
@@ -58,36 +191,34 @@ const Hero = () => {
             </div>
 
             {/* Tech Stack */}
-            <div className="space-y-6">
-              <p className="text-lg font-semibold text-secondary-foreground">Core Tech Stack</p>
-              <div className="flex flex-wrap gap-4">
-                {techStack.map((tech) => (
-                  <span 
-                    key={tech} 
-                    className="px-6 py-3 text-base font-medium glass-gradient rounded-2xl text-card-foreground hover:scale-105 transition-all duration-300 hover:border-primary/50"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* Right Content - Professional Photo */}
           <div className="relative lg:justify-self-end">
+            {/* Animated Background Blob */}
+            <div 
+              ref={backgroundBlobRef}
+              className="absolute inset-0 w-full h-full rounded-3xl opacity-20 pointer-events-none"
+              style={{
+                background: "radial-gradient(circle at 50% 50%, hsl(var(--primary) / 0.15) 0%, hsl(var(--primary) / 0.08) 30%, transparent 70%)",
+                filter: "blur(40px)"
+              }}
+            />
+            
             <div className="relative z-10">
               <div className="relative">
                 <img 
+                  ref={imageRef}
                   src={jainamPortrait} 
                   alt="Jainam Shah - AI/ML Engineer" 
-                  className="w-full max-w-lg mx-auto rounded-3xl premium-glow"
+                  className="w-full max-w-lg mx-auto rounded-3xl"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent rounded-3xl pointer-events-none"></div>
               </div>
             </div>
             
             {/* Stats Overlay */}
-            <div className="absolute top-12 -right-8 lg:right-12">
+            {/* <div className="absolute top-12 -right-8 lg:right-12">
               <div className="stat-card w-40">
                 <div className="stat-number">07+</div>
                 <div className="stat-label">Years experience</div>
@@ -106,11 +237,11 @@ const Hero = () => {
                 <div className="stat-number">07+</div>
                 <div className="stat-label">Countries served</div>
               </div>
-            </div>
+            </div> */}
 
             {/* Floating Elements */}
-            <div className="absolute -top-8 left-1/4 w-4 h-4 bg-primary rounded-full animate-pulse premium-glow"></div>
-            <div className="absolute -bottom-8 right-1/4 w-6 h-6 bg-neon-glow rounded-full animate-pulse premium-glow"></div>
+            {/* <div className="absolute -top-8 left-1/4 w-4 h-4 bg-primary rounded-full animate-pulse "></div>
+            <div className="absolute -bottom-8 right-1/4 w-6 h-6 bg-neon-glow rounded-full animate-pulse "></div> */}
           </div>
         </div>
       </div>
