@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export type ProjectListItem = {
   id: number;
@@ -16,6 +18,9 @@ export type ProjectListItem = {
 const Portfolio = () => {
   const [projects, setProjects] = useState<ProjectListItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const sectionRef = useRef<HTMLElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     let isMounted = true;
@@ -38,11 +43,72 @@ const Portfolio = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!loading && projects.length > 0) {
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Header animation
+      gsap.fromTo(headerRef.current,
+        { y: 80, opacity: 0, scale: 0.9 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 70%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+
+      // Staggered cards animation
+      const cards = gridRef.current?.children;
+      if (cards) {
+        gsap.fromTo(Array.from(cards),
+          { y: 100, opacity: 0, rotateX: 45, scale: 0.8 },
+          {
+            y: 0,
+            opacity: 1,
+            rotateX: 0,
+            scale: 1,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: gridRef.current,
+              start: "top 80%",
+              toggleActions: "play none none reverse"
+            }
+          }
+        );
+      }
+
+      // Parallax effect for the entire section
+      gsap.to(sectionRef.current, {
+        yPercent: -20,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1
+        }
+      });
+    }
+  }, [loading, projects]);
+
   return (
-    <section id="projects" className="bg-background justify-center items-center py-32">
+    <section 
+      ref={sectionRef}
+      id="projects" 
+      className="bg-background justify-center items-center py-32 transform-gpu perspective-1000"
+    >
       <div className="max-w-6xl mx-auto justify-center items-center">
         {/* Header */}
-        <div className="flex justify-center mb-12 text-center">
+        <div ref={headerRef} className="flex justify-center mb-12 text-center">
           <div className="mx-auto">
             <h2 className="text-4xl font-bold mb-4 text-primary">Let's have a look at my portfolio</h2>
             <p className="text-muted-foreground">
@@ -52,9 +118,32 @@ const Portfolio = () => {
         </div>
 
         {/* Portfolio Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {!loading && projects.map((project) => (
-            <div key={project.id} className="project-card group">
+        <div ref={gridRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {!loading && projects.map((project, index) => (
+            <div 
+              key={project.id} 
+              className="project-card group interactive-card magnetic-hover"
+              onMouseMove={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = (e.clientX - rect.left - rect.width / 2) / rect.width;
+                const y = (e.clientY - rect.top - rect.height / 2) / rect.height;
+                
+                gsap.to(e.currentTarget, {
+                  rotateY: x * 15,
+                  rotateX: -y * 15,
+                  duration: 0.3,
+                  ease: "power2.out"
+                });
+              }}
+              onMouseLeave={(e) => {
+                gsap.to(e.currentTarget, {
+                  rotateY: 0,
+                  rotateX: 0,
+                  duration: 0.5,
+                  ease: "elastic.out(1, 0.3)"
+                });
+              }}
+            >
               <div className="relative overflow-hidden rounded-xl mb-4">
                 {project.image && (
                   <img 

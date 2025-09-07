@@ -10,11 +10,13 @@ import Services from "@/components/Services";
 import Contact from "@/components/Contact";
 import ParticleCursor from "@/components/ParticleCursor";
 import ThreeJSScene from "@/components/ThreeJSScene";
+import ScrollProgress from "@/components/ScrollProgress";
 
 const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <ScrollProgress />
       <ThreeJSScene />
       <ParticleCursor />
       <Navigation />
