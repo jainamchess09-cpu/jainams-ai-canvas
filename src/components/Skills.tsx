@@ -1,8 +1,6 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as Icons from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export type SkillCategory = {
   id: number;
@@ -22,8 +20,6 @@ const Skills = () => {
   const [categories, setCategories] = useState<SkillCategory[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const sectionRef = useRef<HTMLElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -49,46 +45,6 @@ const Skills = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (!loading && categories.length > 0) {
-      gsap.registerPlugin(ScrollTrigger);
-
-      // Animate skill cards
-      const cards = gridRef.current?.children;
-      if (cards) {
-        gsap.fromTo(Array.from(cards),
-          { y: 80, opacity: 0, scale: 0.9, rotateY: 45 },
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            rotateY: 0,
-            duration: 0.8,
-            stagger: 0.15,
-            ease: "back.out(1.7)",
-            scrollTrigger: {
-              trigger: gridRef.current,
-              start: "top 85%",
-              toggleActions: "play none none reverse"
-            }
-          }
-        );
-      }
-
-      // Section parallax
-      gsap.to(sectionRef.current, {
-        yPercent: -15,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 2
-        }
-      });
-    }
-  }, [loading, categories]);
-
   const grouped = useMemo(() => {
     const map: Record<number, { title: string; skills: Skill[] }> = {};
     for (const cat of categories) {
@@ -109,37 +65,18 @@ const Skills = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} id="skills" className="py-32 transform-gpu perspective-1000">
+    <section id="skills" className="py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16 scroll-reveal">
+        <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-6 text-primary">Skills & Tech Stack</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             My expertise spans across AI/ML engineering, full-stack development, and cloud infrastructure, enabling me to build end-to-end AI solutions.
           </p>
         </div>
 
-        <div ref={gridRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {!loading && grouped.map((category) => (
-            <div 
-              key={category.id} 
-              className="bg-background p-6 rounded-2xl border border-border interactive-card magnetic-hover"
-              onMouseEnter={(e) => {
-                gsap.to(e.currentTarget, {
-                  scale: 1.05,
-                  rotateY: 5,
-                  duration: 0.3,
-                  ease: "power2.out"
-                });
-              }}
-              onMouseLeave={(e) => {
-                gsap.to(e.currentTarget, {
-                  scale: 1,
-                  rotateY: 0,
-                  duration: 0.5,
-                  ease: "elastic.out(1, 0.3)"
-                });
-              }}
-            >
+            <div key={category.id} className="bg-background p-6 rounded-2xl border border-border">
               <h3 className="text-xl font-semibold mb-4 text-card-foreground">{category.title}</h3>
               <div className="flex flex-wrap gap-3">
                 {category.skills.map((skill) => (

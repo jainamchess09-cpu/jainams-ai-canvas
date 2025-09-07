@@ -1,52 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const navRef = useRef<HTMLElement>(null);
-  const logoRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    // Scroll effect for navigation background
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-
-    // Logo animation on scroll
-    gsap.to(logoRef.current, {
-      rotation: 360,
-      duration: 1,
-      ease: "power2.out",
-      scrollTrigger: {
-        trigger: document.body,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 1
-      }
-    });
-
-    // Navigation slide-in animation
-    gsap.fromTo(navRef.current,
-      { y: -100, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 1,
-        delay: 0.5,
-        ease: "power3.out"
-      }
-    );
-
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const navLinks = [
     { href: "#home", label: "Home" },
@@ -60,61 +17,16 @@ const Navigation = () => {
   ];
 
   return (
-    <nav 
-      ref={navRef}
-      className={`fixed top-5 left-9 right-9 z-50 transition-all duration-300 rounded-[25px] ${
-        scrolled 
-          ? 'glass-nav backdrop-blur-md border border-white/10' 
-          : 'bg-transparent'
-      }`}
-    >
+    <nav className="fixed top-5 left-9 right-9 z-50 glass-nav backdrop-blur-md rounded-[25px]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          <div 
-            ref={logoRef}
-            className="text-3xl font-black text-primary magnetic-hover cursor-pointer"
-            onMouseEnter={(e) => {
-              gsap.to(e.currentTarget, {
-                scale: 1.1,
-                duration: 0.3,
-                ease: "back.out(1.7)"
-              });
-            }}
-            onMouseLeave={(e) => {
-              gsap.to(e.currentTarget, {
-                scale: 1,
-                duration: 0.3,
-                ease: "back.out(1.7)"
-              });
-            }}
-          >
-            jainam
-          </div>
+          <div className="text-3xl font-black text-primary">jainam</div>
 
+          
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-12">
-            {navLinks.map((link, index) => (
-              <a 
-                key={link.href} 
-                href={link.href} 
-                className="nav-link magnetic-hover"
-                onMouseEnter={(e) => {
-                  gsap.to(e.currentTarget, {
-                    y: -3,
-                    scale: 1.05,
-                    duration: 0.3,
-                    ease: "power2.out"
-                  });
-                }}
-                onMouseLeave={(e) => {
-                  gsap.to(e.currentTarget, {
-                    y: 0,
-                    scale: 1,
-                    duration: 0.3,
-                    ease: "power2.out"
-                  });
-                }}
-              >
+            {navLinks.map((link) => (
+              <a key={link.href} href={link.href} className="nav-link">
                 {link.label}
               </a>
             ))}
@@ -122,25 +34,7 @@ const Navigation = () => {
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <Button 
-              className="btn-primary magnetic-hover"
-              onMouseEnter={(e) => {
-                gsap.to(e.currentTarget, {
-                  scale: 1.05,
-                  rotateY: 10,
-                  duration: 0.3,
-                  ease: "power2.out"
-                });
-              }}
-              onMouseLeave={(e) => {
-                gsap.to(e.currentTarget, {
-                  scale: 1,
-                  rotateY: 0,
-                  duration: 0.3,
-                  ease: "power2.out"
-                });
-              }}
-            >
+            <Button className="btn-primary">
               Hire Me
             </Button>
           </div>

@@ -3,7 +3,6 @@ import { ArrowRight, Download, Linkedin, Mail } from "lucide-react";
 import jainamPortrait from "@/assets/jainam-portrait.jpg";
 import { useEffect, useRef, Suspense } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Canvas } from '@react-three/fiber';
 import { Float, Text3D, OrbitControls, MeshDistortMaterial, Sphere, Box } from '@react-three/drei';
 import * as THREE from 'three';
@@ -85,48 +84,6 @@ const Hero = () => {
   const backgroundBlobRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    
-    // Parallax background animation
-    gsap.to(".parallax-bg", {
-      yPercent: -50,
-      ease: "none",
-      scrollTrigger: {
-        trigger: ".hero-section",
-        start: "top bottom",
-        end: "bottom top", 
-        scrub: true
-      }
-    });
-
-    // Interactive magnetic effect for buttons
-    const buttons = [primaryButtonRef.current, secondaryButtonRef.current].filter(Boolean);
-    buttons.forEach((button) => {
-      if (!button) return;
-      
-      button.addEventListener('mousemove', (e) => {
-        const rect = button.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        
-        gsap.to(button, {
-          x: x * 0.3,
-          y: y * 0.3,
-          duration: 0.3,
-          ease: "power2.out"
-        });
-      });
-      
-      button.addEventListener('mouseleave', () => {
-        gsap.to(button, {
-          x: 0,
-          y: 0,
-          duration: 0.5,
-          ease: "elastic.out(1, 0.3)"
-        });
-      });
-    });
-
     // Image animation
     if (imageRef.current) {
       // Set initial state
@@ -254,10 +211,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section id="home" className="hero-section min-h-screen hero-gradient flex items-center pt-20 relative overflow-hidden">
-      {/* Parallax Background */}
-      <div className="parallax-bg floating-element"></div>
-      
+    <section id="home" className="min-h-screen hero-gradient flex items-center pt-20 relative overflow-hidden">
       {/* 3D Background Scene */}
       <div className="absolute inset-0 -z-10">
         <Canvas
