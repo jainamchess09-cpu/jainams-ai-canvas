@@ -294,4 +294,62 @@ All colors MUST be HSL.
   .particle-cursor * {
     pointer-events: none;
   }
+
+  /* Animated grid background */
+  .grid-background {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0, 255, 156, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 156, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: grid-move 20s linear infinite;
+    opacity: 0.3;
+  }
+
+  @keyframes grid-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+  }
+
+  /* Enhanced hero gradient with more dynamic colors */
+  .hero-gradient {
+    background: linear-gradient(135deg, 
+      #0a0a0a 0%, 
+      #0f1419 20%,
+      #0a1a12 40%,
+      #0f1419 60%,
+      #0a0a0a 80%,
+      #0f1419 100%
+    );
+    position: relative;
+  }
+
+  .hero-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at 30% 50%, 
+      rgba(0, 255, 156, 0.15) 0%, 
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 70% 30%, 
+      rgba(0, 255, 156, 0.1) 0%, 
+      transparent 50%
+    );
+    animation: hero-glow 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes hero-glow {
+    0% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0.6;
+      transform: scale(1.1);
+    }
+  }
 }

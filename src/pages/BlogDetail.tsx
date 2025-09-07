@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { blogPosts } from "@/data/blog";
 
 export type BlogDetail = {
   id: number;
@@ -22,25 +22,30 @@ const BlogDetail = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("blog_posts")
-        .select("id,title,excerpt,content,date,read_time,category,image")
-        .eq("id", id)
-        .single();
-      if (!isMounted) return;
-      if (error) {
-        setPost(null);
-      } else {
-        setPost((data as unknown as BlogDetail) || null);
-      }
+    // Simulate loading and find post from local data
+    const timer = setTimeout(() => {
+      const foundPost = blogPosts.find(p => p.id === id);
+      setPost(foundPost ? {
+        ...foundPost,
+        read_time: foundPost.readTime, // Map readTime to read_time
+        content: `This is the full content for "${foundPost.title}". 
+        
+        This article explores the fascinating world of ${foundPost.category.toLowerCase()} and provides insights into modern development practices.
+        
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        
+        Key takeaways from this article:
+        • Understanding the fundamentals
+        • Practical implementation strategies  
+        • Best practices and common pitfalls
+        • Future trends and considerations
+        
+        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`
+      } : null);
       setLoading(false);
-    })();
-    return () => {
-      isMounted = false;
-    };
+    }, 300);
+    
+    return () => clearTimeout(timer);
   }, [id]);
 
   if (loading) {

@@ -1,8 +1,78 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Download, Linkedin, Mail } from "lucide-react";
 import jainamPortrait from "@/assets/jainam-portrait.jpg";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, Suspense } from "react";
 import { gsap } from "gsap";
+import { Canvas } from '@react-three/fiber';
+import { Float, Text3D, OrbitControls, MeshDistortMaterial, Sphere, Box } from '@react-three/drei';
+import * as THREE from 'three';
+
+// 3D Components
+const FloatingCube = ({ position }: { position: [number, number, number] }) => {
+  return (
+    <Float speed={2} rotationIntensity={1} floatIntensity={2}>
+      <Box args={[0.5, 0.5, 0.5]} position={position}>
+        <MeshDistortMaterial
+          color="hsl(156, 100%, 50%)"
+          distort={0.2}
+          speed={2}
+          transparent
+          opacity={0.8}
+          roughness={0.2}
+          metalness={0.8}
+        />
+      </Box>
+    </Float>
+  );
+};
+
+const HeroSphere = () => {
+  return (
+    <Float speed={1} rotationIntensity={0.5} floatIntensity={1}>
+      <Sphere args={[1.5, 64, 64]} position={[3, 0, -2]}>
+        <MeshDistortMaterial
+          color="hsl(156, 100%, 40%)"
+          distort={0.4}
+          speed={1.5}
+          transparent
+          opacity={0.3}
+          roughness={0}
+          metalness={1}
+        />
+      </Sphere>
+    </Float>
+  );
+};
+
+const CodeRain = () => {
+  const count = 50;
+  const positions = new Float32Array(count * 3);
+  
+  for (let i = 0; i < count; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 20;
+    positions[i * 3 + 1] = Math.random() * 20 - 10;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+  }
+
+  return (
+    <points>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={positions.length / 3}
+          array={positions}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        color="hsl(156, 100%, 60%)"
+        size={0.05}
+        transparent
+        opacity={0.8}
+      />
+    </points>
+  );
+};
 
 const Hero = () => {
   const imageRef = useRef<HTMLImageElement>(null);
@@ -141,8 +211,44 @@ const Hero = () => {
   }, []);
 
   return (
-    <section id="home" className="min-h-screen hero-gradient flex items-center pt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+    <section id="home" className="min-h-screen hero-gradient flex items-center pt-20 relative overflow-hidden">
+      {/* 3D Background Scene */}
+      <div className="absolute inset-0 -z-10">
+        <Canvas
+          camera={{ position: [0, 0, 10], fov: 75 }}
+          style={{ background: 'transparent' }}
+        >
+          <Suspense fallback={null}>
+            <ambientLight intensity={0.3} />
+            <pointLight position={[10, 10, 10]} intensity={1} color="hsl(156, 100%, 50%)" />
+            <pointLight position={[-10, -10, -10]} intensity={0.5} color="hsl(280, 100%, 50%)" />
+            <directionalLight position={[5, 5, 5]} intensity={0.5} color="hsl(156, 100%, 70%)" />
+            
+            <HeroSphere />
+            <FloatingCube position={[-4, 2, -1]} />
+            <FloatingCube position={[4, -2, -3]} />
+            <FloatingCube position={[-2, -3, -2]} />
+            <CodeRain />
+            
+            <OrbitControls
+              enableZoom={false}
+              enablePan={false}
+              enableRotate={true}
+              autoRotate
+              autoRotateSpeed={0.3}
+              maxPolarAngle={Math.PI / 2}
+              minPolarAngle={Math.PI / 2}
+            />
+          </Suspense>
+        </Canvas>
+      </div>
+
+      {/* Animated Grid Background */}
+      <div className="absolute inset-0 -z-20">
+        <div className="grid-background"></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Content */}
           <div className="space-y-12">
